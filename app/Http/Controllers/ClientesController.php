@@ -44,8 +44,9 @@ class ClientesController extends Controller
         ]);
 
         if ($validator->fails()) {
+            $error = $validator->errors();
             $json = array(
-                'detalles' => 'registros no validos',
+                'detalles' => $error,
             );
 
             return json_encode($json);

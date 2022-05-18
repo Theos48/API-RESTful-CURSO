@@ -135,8 +135,9 @@ class CursosController extends Controller
         ]);
 
         if ($validator->fails()) {
+            $error = $validator->errors();
             $json["status"] = 404;
-            $json["detalles"] = 'Registro con errores: titulo repetido';
+            $json["detalles"] = $error;
             return json_encode($json);
         }
 
