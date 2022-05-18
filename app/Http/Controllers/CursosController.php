@@ -22,6 +22,7 @@ class CursosController extends Controller
         $clientes = Clientes::all();
         $autorizado = false;
 
+        //Verificar token de autentificación
         foreach ($clientes as $key => $value) {
             if ("Basic " . base64_encode($value['id_cliente'] . ":" . $value['llave_secreta']) == $token) {
                 $autorizado = true;
@@ -38,20 +39,38 @@ class CursosController extends Controller
             return json_encode($json);
         }
 
+        //Eleccion de paginacion
         // $cursos = Cursos::all();
-        $cursos = DB::table('cursos')
-            ->join('clientes', 'cursos.id_creador', '=', 'clientes.id')
-            ->select(
-                'cursos.id',
-                'cursos.titulo',
-                'cursos.descripcion',
-                'cursos.instructor',
-                'cursos.id_creador',
-                'clientes.nombre',
-                'clientes.apellido',
-            )
-            ->get();
-            
+        if (isset($_GET["page"])) {
+            $cursos = DB::table('cursos')
+                ->join('clientes', 'cursos.id_creador', '=', 'clientes.id')
+                ->select(
+                    'cursos.id',
+                    'cursos.titulo',
+                    'cursos.descripcion',
+                    'cursos.instructor',
+                    'cursos.id_creador',
+                    'clientes.nombre',
+                    'clientes.apellido',
+                )
+                ->paginate(15);
+        } else {
+            $cursos = DB::table('cursos')
+                ->join('clientes', 'cursos.id_creador', '=', 'clientes.id')
+                ->select(
+                    'cursos.id',
+                    'cursos.titulo',
+                    'cursos.descripcion',
+                    'cursos.instructor',
+                    'cursos.id_creador',
+                    'clientes.nombre',
+                    'clientes.apellido',
+                )
+                ->get();
+        }
+
+
+
 
         $json = array(
             "status" => 200,
