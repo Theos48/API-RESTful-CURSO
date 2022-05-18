@@ -10,6 +10,8 @@ use App\Models\Cursos;
 use App\Models\Clientes;
 use Faker\Provider\Base;
 use Illuminate\Support\Facades\Redis;
+use Illuminate\Support\Facades\DB;
+
 
 class CursosController extends Controller
 {
@@ -36,7 +38,20 @@ class CursosController extends Controller
             return json_encode($json);
         }
 
-        $cursos = Cursos::all();
+        // $cursos = Cursos::all();
+        $cursos = DB::table('cursos')
+            ->join('clientes', 'cursos.id_creador', '=', 'clientes.id')
+            ->select(
+                'cursos.id',
+                'cursos.titulo',
+                'cursos.descripcion',
+                'cursos.instructor',
+                'cursos.id_creador',
+                'clientes.nombre',
+                'clientes.apellido',
+            )
+            ->get();
+            
 
         $json = array(
             "status" => 200,
@@ -50,8 +65,7 @@ class CursosController extends Controller
             return json_encode($json);
         };
 
-
-
+        // return json_encode($cursos);
         return json_encode($json);
     }
     //Guardar registro
@@ -231,7 +245,7 @@ class CursosController extends Controller
         );
 
         $validarCurso = Cursos::where('id', $id)->get();
-        
+
         foreach ($clientes as $key => $value) {
             if ("Basic " . base64_encode($value['id_cliente'] . ":" . $value['llave_secreta']) == $token) {
                 $autorizado = true;
